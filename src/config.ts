@@ -3,11 +3,11 @@ export default {
         "host": "smtp-relay.sendinblue.com",
         "port": "587",
         "secure": false,
-        "user": "leandro.andrade@jarjar.com.br",
-        "pass": "LMdOR9vHnAJt6Sqh"
+        "user": "teste@teste",
+        "pass": "LMdOR"
     },
     "host": {
-        "url": "https://jarjar-351314.uc.r.appspot.com",
+        "url": "https://testeuc.r.appspot.com",
         "port": "80"
     }
   }
