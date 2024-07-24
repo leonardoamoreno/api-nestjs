@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+model data {
+  id          Int          @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  title       String?      @db.VarChar(100)
+  content     String?      @db.MediumText
+  create_time DateTime?    @db.Timestamp(0)
+  id_user     Int
+  user        user         @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_User_Data")
+  tags_datas  tags_datas[]
+
+  @@index([id_user], map: "FK_User_idx")
+}
+
+model insight {
+  id          Int       @id
+  title       String?   @db.VarChar(100)
+  content     String?   @db.MediumText
+  create_date DateTime? @default(now()) @db.Timestamp(0)
+  id_user     Int
+  user        user      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_InsightId_UserId")
+
+  @@index([id_user], map: "FK_InsightId_UserId_idx")
+}
+
+model project {
+  id          Int       @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  name        String    @db.VarChar(55)
+  description String    @db.MediumText
+  id_user     Int
+  create_date DateTime? @default(now()) @db.Timestamp(0)
+  user        user      @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_USER")
+
+  @@index([id_user], map: "FK_USER_idx")
+}
+
+model tag {
+  id          Int          @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  name        String?      @db.VarChar(45)
+  id_user     Int
+  create_date DateTime?    @default(now()) @db.Timestamp(0)
+  user        user         @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_UserId_TagId")
+  tags_datas  tags_datas[]
+
+  @@index([id_user], map: "FK_UserId_TagId_idx")
+}
+
+model user {
+  id                Int               @id @unique(map: "id_UNIQUE") @default(autoincrement())  
+  name              String?           @db.VarChar(40)    
+  username          String?           @db.VarChar(255)
+  password          String            @db.VarChar(70)
+  isEmailConfirmed  Boolean           @default(false)
+  phone             String?           @db.VarChar(17)
+  company           String?           @db.VarChar(35)
+  create_date       DateTime?         @default(now()) @db.Timestamp(0)
+  token             String            @db.VarChar(7)
+  data              data[]
+  insight           insight[]
+  project           project[]
+  tag               tag[]
+  users_companies users_companies[]
+}
+
+model company {
+  id                  Int               @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  name                String            @db.VarChar(100)
+  number_of_employees Int?
+  users_companies     users_companies[]
+}
+
+model users_companies {
+  id         Int     @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  id_user    Int
+  id_company Int
+  company    company @relation(fields: [id_company], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_Company_user")
+  user       user    @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_User_Company")
+
+  @@index([id_company], map: "FK_Company_user_idx")
+  @@index([id_user], map: "FK_User_Company_idx")
+}
+
+model tags_datas {
+  id      Int  @id @default(autoincrement())
+  id_tag  Int
+  id_data Int
+  data    data @relation(fields: [id_data], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DATA_TAG")
+  tag     tag  @relation(fields: [id_tag], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_TAG_DATA")
+
+  @@index([id_data], map: "FK_DATA_TAG_idx")
+  @@index([id_tag], map: "FK_TAG_DATA_idx")
+}
+
+model lead {
+  id          Int       @id @default(autoincrement())
+  email       String?   @db.VarChar(40)
+  name        String?   @db.VarChar(40)
+  lastName    String?   @db.VarChar(40)
+  cargo       String?   @db.VarChar(35)
+  company     String?   @db.VarChar(35)
+  phone       String?   @db.VarChar(17)
+  tag         String?   @db.VarChar(15)
+  create_date DateTime? @default(now()) @db.Timestamp(0)
+}
